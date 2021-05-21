@@ -134,9 +134,15 @@
             
             <div class="post-full-content">
                 <article id="photoswipe" class="markdown-body">
-                    <p><strong>如何将你的机器学习算法迅速分享给别人，让对方体验，一直是一件麻烦事儿。</strong></p>
-<p>首先大部分人都是在本地跑代码，想要让别人使用你的模型，要么上github；要么将代码打包或者封装成docker用QQ/百度云传输；要么就是学些前后端知识，写个前端界面，买个域名，用flask这样微服务框架快速部署，也许还要结合一下内网穿透。</p>
-<p>这些方案的问题在于——要么需要对方会编程，要么需要你会前后端开发，总结起来就是：<strong>麻烦</strong>。</p>
+                    <p><strong>如何将你的AI算法迅速分享给别人，让对方体验，一直是一件麻烦事儿。</strong></p>
+<p>首先大部分人都是在本地跑代码，让别人使用你的模型，以往有这三种方案：</p>
+<ul>
+<li>上github</li>
+<li>将代码打包或者封装成docker后，用QQ/百度云/U盘传输</li>
+<li>学习前后端知识，写个前端界面，买个域名，用flask这样微服务框架快速部署，看情况结合一下内网穿透。</li>
+</ul>
+<p>这些方案的问题在于——前两者需要对方会编程会配置环境（还得愿意），并且要读你长长的readme文档，<strong>我们的分享对象满足这个条件可称寥寥，也没有可视化界面</strong>；后者则需要你这个算法工程师升级成全栈，学习前后端开发，<strong>学习成本太高</strong>。</p>
+<p>总结起来：<strong>场景不匹配，需求不契合，费时又费力！</strong></p>
 <p>那么有没有更好的解决方案呢？有！它就是我今天要给大家安利的一个python开源库：<strong>Gradio</strong>。</p>
 <p>​    <img alt="image-20210521152614971" class="post-img b-lazy" data-img="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/01/0101.png" data-index="0" data-src="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/01/0101.png"></p>
 <p>Gradio能够自动化的生成前端界面，定义好输入输出，只需要增加几行代码，一个web交互式页面就做好了。</p>
