@@ -134,17 +134,18 @@
             
             <div class="post-full-content">
                 <article id="photoswipe" class="markdown-body">
-                    <p><strong>如何将你的AI算法迅速分享给别人，让对方体验，一直是一件麻烦事儿。</strong></p>
+                    <p><strong><img alt="1" class="post-img b-lazy" data-img="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/header_image2.png" data-index="0" data-src="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/header_image2.png"></strong></p>
+<p><strong>如何将你的AI算法迅速分享给别人，让对方体验，一直是一件麻烦事儿。</strong></p>
 <p>首先大部分人都是在本地跑代码，让别人使用你的模型，以往有这三种方案：</p>
 <ul>
 <li>上github</li>
 <li>将代码打包或者封装成docker后，用QQ/百度云/U盘传输</li>
 <li>学习前后端知识，写个前端界面，买个域名，用flask这样微服务框架快速部署，看情况结合一下内网穿透。</li>
 </ul>
-<p>这些方案的问题在于——前两者需要对方会编程会配置环境（还得愿意），也没有交互界面，<strong>我们的分享对象满足这个条件的寥寥无几</strong>；后者则需要你这个算法工程师升级成全栈，学习前后端开发，<strong>学习成本太高</strong>。</p>
+<p>这些方案的问题在于——前两者需要对方会编程会配置环境（还得愿意），<strong>我们的分享对象满足这个条件的寥寥无几</strong>；后者则需要你这个算法工程师升级成全栈，学习前后端开发，<strong>学习成本太高</strong>。</p>
 <p>总结起来：<strong>场景不匹配，需求不契合，费时又费力！</strong></p>
 <p>那么有没有更好的解决方案呢？有！它就是我今天要给大家安利的一个python开源库：<strong>Gradio</strong>。</p>
-<p>​    <img alt="image-20210521152614971" class="post-img b-lazy" data-img="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/01/0101.png" data-index="0" data-src="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/01/0101.png"></p>
+<p>​    <img alt="image-20210521152614971" class="post-img b-lazy" data-img="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/01/0101.png" data-index="1" data-src="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/01/0101.png"></p>
 <p>Gradio是MIT的开源项目，GitHub 2k+ star。</p>
 <p>使用gradio，只需在原有的代码中<strong>增加几行</strong>，就能自动化生成交互式web页面，并支持多种输入输出格式，比如图像分类中的图&gt;&gt;标签，超分辨率中的图&gt;&gt;图等。</p>
 <p>同时还支持生成能外部网络访问的链接，<strong>能够迅速让你的朋友，同事体验你的算法</strong>。</p>
@@ -168,16 +169,16 @@
 </ul>
 <p>最后我们用<code>interface.lauch()</code>把页面一发布，一个本地静态交互页面就完成了！</p>
 <p>在浏览器输入<code>http://127.0.0.1:7860/</code>,查收你的页面：</p>
-<p><img alt="image-20210521152336959" class="post-img b-lazy" data-img="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/01/0102.png" data-index="1" data-src="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/01/0102.png"></p>
+<p><img alt="image-20210521152336959" class="post-img b-lazy" data-img="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/01/0102.png" data-index="2" data-src="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/01/0102.png"></p>
 <p>上传一张图片，点击「SUBMIT」，大功告成。</p>
-<p><img alt="image-20210521152500026" class="post-img b-lazy" data-img="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/01/0103.png" data-index="2" data-src="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/01/0103.png"></p>
+<p><img alt="image-20210521152500026" class="post-img b-lazy" data-img="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/01/0103.png" data-index="3" data-src="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/01/0103.png"></p>
 <p>对于任何图像处理类的ML代码来说，只要定义好一个图像输入&gt;&gt;模型推理&gt;&gt;返回图片的函数（逻辑和RGB转灰度图本质上没区别），放到<code>fn</code>中，就完事了。</p>
 <p>​    </p>
 <h3 id="2-增加example"><a href="#2-增加example" class="headerlink" title="2.增加example"></a>2.增加example</h3><p>我们可以在页面下方添加供用户选择的测试样例。</p>
 <p>在<code>gr.Interface</code>里的<code>examples</code>中放入图片路径，格式为[[路径1],[路径2],…]。</p>
 <figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> gradio <span class="keyword">as</span> gr</span><br><span class="line"><span class="keyword">import</span> cv2</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">to_black</span>(<span class="params">image</span>):</span></span><br><span class="line">    output = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)</span><br><span class="line">    <span class="keyword">return</span> output</span><br><span class="line"></span><br><span class="line">interface = gr.Interface(fn=to_black, inputs=<span class="string">"image"</span>, outputs=<span class="string">"image"</span>,</span><br><span class="line">                        examples=[[<span class="string">"test.png"</span>]])</span><br><span class="line">interface.launch()</span><br></pre></td></tr></tbody></table></figure>
 
-<p><img alt="image-20210521155634673" class="post-img b-lazy" data-img="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/01/0104.png" data-index="3" data-src="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/01/0104.png"></p>
+<p><img alt="image-20210521155634673" class="post-img b-lazy" data-img="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/01/0104.png" data-index="4" data-src="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/01/0104.png"></p>
 <p>增加example不仅能让你的UI界面更美观，逻辑更完善，也有一些其他意义：</p>
 <ul>
 <li>比如做了一个图像去噪算法，但是用户手头并没有躁点照片，example能让他更快的体验到效果</li>
@@ -187,7 +188,7 @@
 <p>免费用户的链接可以使用24小时，想要长期的话需要在gradio官方购买云服务。</p>
 <h2 id="4-升个级-图像分类pytorch-resnet18"><a href="#4-升个级-图像分类pytorch-resnet18" class="headerlink" title="4.升个级:图像分类pytorch+resnet18"></a>4.升个级:图像分类pytorch+resnet18</h2><figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> gradio <span class="keyword">as</span> gr</span><br><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">from</span> torchvision <span class="keyword">import</span> transforms</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line"></span><br><span class="line">model = torch.hub.load(<span class="string">'pytorch/vision:v0.6.0'</span>, <span class="string">'resnet18'</span>, pretrained=<span class="literal">True</span>).<span class="built_in">eval</span>()</span><br><span class="line"></span><br><span class="line"><span class="comment"># Download human-readable labels for ImageNet.</span></span><br><span class="line">response = requests.get(<span class="string">"https://git.io/JJkYN"</span>)</span><br><span class="line">labels = response.text.split(<span class="string">"\n"</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">predict</span>(<span class="params">inp</span>):</span></span><br><span class="line">  inp = Image.fromarray(inp.astype(<span class="string">'uint8'</span>), <span class="string">'RGB'</span>)</span><br><span class="line">  inp = transforms.ToTensor()(inp).unsqueeze(<span class="number">0</span>)</span><br><span class="line">  <span class="keyword">with</span> torch.no_grad():</span><br><span class="line">    prediction = torch.nn.functional.softmax(model(inp)[<span class="number">0</span>], dim=<span class="number">0</span>)</span><br><span class="line">  <span class="keyword">return</span> {labels[i]: <span class="built_in">float</span>(prediction[i]) <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1000</span>)}</span><br><span class="line"></span><br><span class="line">inputs = gr.inputs.Image()</span><br><span class="line">outputs = gr.outputs.Label(num_top_classes=<span class="number">3</span>)</span><br><span class="line">gr.Interface(fn=predict, inputs=inputs, outputs=outputs).launch()</span><br></pre></td></tr></tbody></table></figure>
 
-<p><img alt="image-20210521160432207" class="post-img b-lazy" data-img="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/01/0105.png" data-index="4" data-src="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/01/0105.png"></p>
+<p><img alt="image-20210521160432207" class="post-img b-lazy" data-img="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/01/0105.png" data-index="5" data-src="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/blogs/01/0105.png"></p>
 <p>图像分类任务是机器学习经典任务。上面我们在outputs中设置了<code>gr.outputs.Label(num_top_classes=3)</code>，这是Gradio中专为图像分类<strong>展示类标</strong>定制的函数.</p>
 <p><strong>修改inputs和outputs的组合，总能找到适合你的算法的那一个。</strong></p>
 <p>ps:不得不说imagenet的类标真细</p>
