@@ -135,7 +135,7 @@
             <div class="post-full-content">
                 <article id="photoswipe" class="markdown-body">
                     <p><img alt="1" class="post-img b-lazy" data-img="https://linimages.oss-cn-beijing.aliyuncs.com/typora/header_image2.png" data-index="0" data-src="https://linimages.oss-cn-beijing.aliyuncs.com/typora/header_image2.png"></p>
-<h2 id="略过简介和之前的工作"><a href="#略过简介和之前的工作" class="headerlink" title="略过简介和之前的工作"></a>略过简介和之前的工作</h2><p>​    在这个工作中，我们重新探索了盲人脸超分辨问题。我们的目标是复原那些在自然界观察得到的退化人脸，我们的idea是去无缝融合GAN和DNN的优点。我们首先预训练了一个GAN，这个GAN是为了高清人脸照片生成的，以及把它嵌入到一个DNN中作为一个人脸修复的前置解码器。</p>
+<h2 id="1～2-开门见山"><a href="#1～2-开门见山" class="headerlink" title="1～2.开门见山"></a>1～2.开门见山</h2><p>​    在这个工作中，我们重新探索了盲人脸超分辨问题。我们的目标是复原那些在自然界观察得到的退化人脸，我们的idea是去无缝融合GAN和DNN的优点。我们首先预训练了一个GAN，这个GAN是为了高清人脸照片生成的，以及把它嵌入到一个DNN中作为一个人脸修复的前置解码器。</p>
 <p>​    然后，这个以GAN为前置解码器的DNN被一系列的综合的一对对低情-高清人脸微调。在此期间DNN学习将退化的图像输入映射到一个所需的潜在空间，以至于这个GAN前置网络可以重建所需的高清人脸照片。</p>
 <p>​    我们仔细地设计了GAN模块，让它能更好与符合一个U形设计的DNN。在这里这些深层特征是针对全部人脸重建提取的，被用于生成浅编码，同时浅层特征被用于作为噪声去生成局部人脸细节和保持图像背景。</p>
 <p>​    在这个方法下，我们训练好的模型可以重建高清人脸的真实照片细节从自然界的退化人脸，避免了过度平滑的结果（由盲人脸问题的high illness造成的）。</p>
@@ -164,11 +164,28 @@
 <h3 id="完整的网络结构"><a href="#完整的网络结构" class="headerlink" title="完整的网络结构"></a>完整的网络结构</h3><p>​    一旦GAN先验网路被训练通过使用一些数据机（比如FFHQ），我们把它嵌入到U形DNN中作为一个解码器。隐编码z和输入到GAN模块的noise被全连接层（深度特征）的输入和DNN编码器的shallower层分别取代，这将控制全局人脸结构、局部人脸细节和人脸图像背景的重建。</p>
 <p>​    因为提出的模型不是全卷积，所以低清人脸图像首先被resize到需要的尺寸（1024*1024），使用简单的BICUBIC在输入到GPEN之前。在嵌入后，整个GPEN将会被微调以至于编码部分和解码部分可以学习去彼此适应。</p>
 <p>​    </p>
+<h2 id="3-3-训练策略"><a href="#3-3-训练策略" class="headerlink" title="3.3 训练策略"></a>3.3 训练策略</h2><p>​    我们首先使用一个高清人脸数据集预训练GAN先验网络，训练策略和StyleGAN一致。这个预训练GAN模型被嵌入到GPEN中，并且我们使用一系列的人工合成LQ-HQ人脸图像对来微调整个网络（人工合成流程在4.2）。</p>
+<p>​    为了微调GPEN模型，我们采用三个loss函数：adversarial loss、content loss、feature matching loss。</p>
+<ul>
+<li><p>La：被GAN先验网络继承来的：</p>
+<p><img alt="image-20210527231935154" class="post-img b-lazy" data-img="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527231935154.png" data-index="3" data-src="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527231935154.png"></p>
+</li>
+</ul>
+<p>​    其中X和X～表示ground-truth高清图像和退化LQ图像，G是训练中的生成器，D是鉴别器。</p>
+<ul>
+<li>Lc被定义为在生成器的最终结果和匹配的原始图像的L1范数距离。</li>
+<li>Lf与感知损失相似，但是它基于分类器而不是预训练的VGG网络，这更符合我们的工作。它被如下构建：</li>
+</ul>
+<p><img alt="image-20210527232341867" class="post-img b-lazy" data-img="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527232341867.png" data-index="4" data-src="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527232341867.png"></p>
+<p>​    在这里T是中间层（被用于特征提取）的全部数量。Di(X)是鉴别器D的第i层提取特征。</p>
+<p>​    最终的loss L 定义如下：</p>
+<p><img alt="image-20210527232546705" class="post-img b-lazy" data-img="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527232546705.png" data-index="5" data-src="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527232546705.png"></p>
+<p>​    在这里<em>α</em> 和 <em>β</em>是平衡参数。The content loss Lc 强化了好的特征和保护了原始彩色信息。通过引导Lf在鉴别器中，La会有更好的平衡去复原更真实的人脸图像的丰富细节。在所有的实验中，我们设置<em>α</em> =1和 <em>β</em>=0.02。  </p>
 <h2 id="4-1数据集和评估方案"><a href="#4-1数据集和评估方案" class="headerlink" title="4.1数据集和评估方案"></a>4.1数据集和评估方案</h2><p>​    FFHQ数据机包含了7w张高清人脸图像，分辨率均为1024*1024，被用于训练我们的模型。我们首先使用它去训练GAN先验网络，然后采用基于FFHQ数据集制备的退化数据来微调整个GPEN。</p>
 <p>​    为了评估我们的模型，我们使用CelebA-HQ数据机去评估低清人脸图像来量化比较GPEN与其他的SOTA方案。我们也收集了1000张来自网络的真实世界的低清人脸来评估我们的模型在wild的表现。</p>
 <p>​    在量化评估里，PSNR，FID和LPIPS是被使用的。值得一提的是，所有这些方法只能被作为参考，因为他们不能真正的反应一个盲人脸修复算法的表现，特别是对于wild盲人脸复原问题。</p>
 <h2 id="4-2低清与高清图像对的制备"><a href="#4-2低清与高清图像对的制备" class="headerlink" title="4.2低清与高清图像对的制备"></a>4.2低清与高清图像对的制备</h2><p>​    我们人工合成（synthesize）退化人脸，这些人脸源于FFHQ中的高清图像，它们使用了下面的退化模型：</p>
-<p><img alt="image-20210527180451448" class="post-img b-lazy" data-img="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527180451448.png" data-index="3" data-src="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527180451448.png"></p>
+<p><img alt="image-20210527180451448" class="post-img b-lazy" data-img="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527180451448.png" data-index="6" data-src="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527180451448.png"></p>
 <ul>
 <li>I：输入人脸图</li>
 <li>k：模糊核</li>
@@ -193,18 +210,15 @@
 <p>​    第二个变体是GPEN-w/o-noise，这指的是这个GPEN模型没有噪声输入。</p>
 <p>​    第三个变体是GPEN-noise-add，这是指噪声输入是add的而不是连接到卷积中的。</p>
 <p>​    我们基于CelebA-HQ数据集来评估GPEN和它的三个变体。LQ图像是使用退化模型制备的（4.2）。</p>
-<p><img alt="image-20210527204206871" class="post-img b-lazy" data-img="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527204206871.png" data-index="4" data-src="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527204206871.png"></p>
+<p><img alt="image-20210527204206871" class="post-img b-lazy" data-img="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527204206871.png" data-index="7" data-src="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527204206871.png"></p>
 <p>​    我们可以看到GPE有更好的数值表现比起它的变体。</p>
-<p><img alt="image-20210527204311354" class="post-img b-lazy" data-img="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527204311354.png" data-index="5" data-src="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527204311354.png"></p>
+<p><img alt="image-20210527204311354" class="post-img b-lazy" data-img="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527204311354.png" data-index="8" data-src="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527204311354.png"></p>
 <p>​    上图展示了变体与本体在一张图上的不同结果。我们可以看到GPEN-w/o-ft可以生成干净的高清人脸图像，但是，这张人脸和ground-truth完全不同，以及这张图片的背景也完全不同。这是因为没有微调先验GAN，它是非常困难的生成需要的浅编码到隐空间Z，这符合在很多GAN倒置工作中的发现。</p>
 <p>​    通过消除噪声输出，GPEN-w/o-noise的结果是比起GPEN-w/o-ft更模糊的，以及有一些压缩伪影生成在图像的边缘。这表明噪声输入在合成局部细节上起到了重要作用。</p>
 <p>​    GPEN-noise-add达到了和GPEN相近的效果不是轻微的少了一些面部细节，而它生成了一些错误的细节在图像的背景上。</p>
 <p>​    总的来说，GPEN比起它的变体要有更好的表现，表明了拼接的U形结构和我们的训练方案对于盲人脸复原任务的有效性。</p>
-<h2 id="4-4-在人工合成图像上的实验"><a href="#4-4-在人工合成图像上的实验" class="headerlink" title="4.4 在人工合成图像上的实验"></a>4.4 在人工合成图像上的实验</h2><p>​    为了量化的比较GPEN与其他SOTA，我们首先在人工合成图像上进行实验。比起很多人脸复原方法通常是被设计于人脸超分（FSR）而不是盲人脸复原（BFR），我们分别进行了在FSR和BFR上的实验，在其中不同的比较方案是被用于一对对照中。</p>
-<h3 id="盲人脸复原"><a href="#盲人脸复原" class="headerlink" title="盲人脸复原"></a>盲人脸复原</h3><p>​    通过使用退化模型和与4.2相同的参数设置，我们人工合成了一系列的LQ人脸图像在CelebA-HQ数据集上，用于评估。我们比较了GPEN与最新的BFR办法，包括Pix2PixHD ,</p>
-<p>Super-FAN, GFRNet, GWAInet, DFDNet ,HiFaceGAN。这些模型是原作者训练版本。</p>
-<p>​    我们在这个实验中与那些人脸超分方法比较在这个实验中，因为他们假设了一种非常简单的退化的模型。（例如：bicubic下采样）和不能解决这个有挑战性的盲人脸复原任务。</p>
 <h2 id="要补习的知识点"><a href="#要补习的知识点" class="headerlink" title="要补习的知识点"></a>要补习的知识点</h2><ul>
+<li>GAN基础知识与训练知识</li>
 <li>U-net</li>
 <li>StyleGAN</li>
 </ul>
@@ -253,7 +267,7 @@
         </a>
     </div>
     <div class="toc-main">
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%95%A5%E8%BF%87%E7%AE%80%E4%BB%8B%E5%92%8C%E4%B9%8B%E5%89%8D%E7%9A%84%E5%B7%A5%E4%BD%9C"><span class="toc-text">略过简介和之前的工作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1%E5%8A%A8%E6%9C%BA%E4%B8%8E%E6%A1%86%E6%9E%B6"><span class="toc-text">3.1动机与框架</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84"><span class="toc-text">3.2网络结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#GAN%E5%85%88%E9%AA%8C%E7%BD%91%E7%BB%9C"><span class="toc-text">GAN先验网络</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%8C%E6%95%B4%E7%9A%84%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84"><span class="toc-text">完整的网络结构</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1%E6%95%B0%E6%8D%AE%E9%9B%86%E5%92%8C%E8%AF%84%E4%BC%B0%E6%96%B9%E6%A1%88"><span class="toc-text">4.1数据集和评估方案</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2%E4%BD%8E%E6%B8%85%E4%B8%8E%E9%AB%98%E6%B8%85%E5%9B%BE%E5%83%8F%E5%AF%B9%E7%9A%84%E5%88%B6%E5%A4%87"><span class="toc-text">4.2低清与高清图像对的制备</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-%E6%B6%88%E8%9E%8D%E5%AE%9E%E9%AA%8C"><span class="toc-text">4.3 消融实验</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-4-%E5%9C%A8%E4%BA%BA%E5%B7%A5%E5%90%88%E6%88%90%E5%9B%BE%E5%83%8F%E4%B8%8A%E7%9A%84%E5%AE%9E%E9%AA%8C"><span class="toc-text">4.4 在人工合成图像上的实验</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%B2%E4%BA%BA%E8%84%B8%E5%A4%8D%E5%8E%9F"><span class="toc-text">盲人脸复原</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A6%81%E8%A1%A5%E4%B9%A0%E7%9A%84%E7%9F%A5%E8%AF%86%E7%82%B9"><span class="toc-text">要补习的知识点</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1%EF%BD%9E2-%E5%BC%80%E9%97%A8%E8%A7%81%E5%B1%B1"><span class="toc-text">1～2.开门见山</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1%E5%8A%A8%E6%9C%BA%E4%B8%8E%E6%A1%86%E6%9E%B6"><span class="toc-text">3.1动机与框架</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84"><span class="toc-text">3.2网络结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#GAN%E5%85%88%E9%AA%8C%E7%BD%91%E7%BB%9C"><span class="toc-text">GAN先验网络</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%8C%E6%95%B4%E7%9A%84%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84"><span class="toc-text">完整的网络结构</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3-%E8%AE%AD%E7%BB%83%E7%AD%96%E7%95%A5"><span class="toc-text">3.3 训练策略</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1%E6%95%B0%E6%8D%AE%E9%9B%86%E5%92%8C%E8%AF%84%E4%BC%B0%E6%96%B9%E6%A1%88"><span class="toc-text">4.1数据集和评估方案</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2%E4%BD%8E%E6%B8%85%E4%B8%8E%E9%AB%98%E6%B8%85%E5%9B%BE%E5%83%8F%E5%AF%B9%E7%9A%84%E5%88%B6%E5%A4%87"><span class="toc-text">4.2低清与高清图像对的制备</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-%E6%B6%88%E8%9E%8D%E5%AE%9E%E9%AA%8C"><span class="toc-text">4.3 消融实验</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A6%81%E8%A1%A5%E4%B9%A0%E7%9A%84%E7%9F%A5%E8%AF%86%E7%82%B9"><span class="toc-text">要补习的知识点</span></a></li></ol>
     </div>
 </div>
 
