@@ -1,0 +1,511 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<link rel="preconnect" href="//www.googletagmanager.com">
+	<link rel="preconnect" href="//zz.bdstatic.com">
+	<link rel="preconnect" href="//sp0.baidu.com">
+	<link rel="preconnect" href="//www.google-analytics.com">
+	<link rel="preconnect" href="//cdn1.lncld.net">
+	<link rel="preconnect" href="//unpkg.com">
+	<link rel="preconnect" href="//app-router.leancloud.cn">
+	<link rel="preconnect" href="//9qpuwspm.api.lncld.net">
+	<link rel="preconnect" href="//gravatar.loli.net">
+
+	<title>【论文翻译】GPEN:基于先验GAN嵌入网络的盲人脸重建问题解决方案 | 小林的思考簿</title>
+
+	<meta name="HandheldFriendly" content="True">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+	<meta name="generator" content="hexo">
+	<meta name="author" content="林泽毅kavin">
+	<meta name="description" content="如何快速分享你的算法让人体验？试试Gradio。">
+
+	
+	<meta name="keywords" content="如何快速分享你的算法让人体验？试试Gradio。">
+	
+
+	
+	<link rel="shortcut icon" href="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/%E7%84%95%E5%BD%B1-%E9%80%9A%E7%94%A8%E6%96%87%E4%BB%B6/%E5%90%84%E7%A7%8Dlogo/%E5%B0%8F%E7%84%95%E5%A4%B4%E5%83%8F_%E8%93%9D.PNG">
+	<link rel="apple-touch-icon" href="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/%E7%84%95%E5%BD%B1-%E9%80%9A%E7%94%A8%E6%96%87%E4%BB%B6/%E5%90%84%E7%A7%8Dlogo/%E5%B0%8F%E7%84%95%E5%A4%B4%E5%83%8F_%E8%93%9D.PNG">
+	
+
+	
+	<meta name="theme-color" content="#3c484e">
+	<meta name="msapplication-TileColor" content="#3c484e">
+	
+
+	
+
+	
+
+	<meta property="og:site_name" content="小林的思考簿">
+	<meta property="og:type" content="article">
+	<meta property="og:title" content="【论文翻译】GPEN:基于先验GAN嵌入网络的盲人脸重建问题解决方案 | 小林的思考簿">
+	<meta property="og:description" content="如何快速分享你的算法让人体验？试试Gradio。">
+	<meta property="og:url" content="http://example.com/2021/05/27/%E3%80%90%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E3%80%91GPEN/">
+
+	
+	<meta property="article:published_time" content="2021-05-27T17:05:62+08:00"> 
+	<meta property="article:author" content="林泽毅kavin">
+	<meta property="article:published_first" content="小林的思考簿, /2021/05/27/%E3%80%90%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E3%80%91GPEN/">
+	
+
+	
+	
+	
+<link rel="stylesheet" href="/css/allinonecss.min.css">
+
+
+	
+	
+	
+</head>
+
+<body class="post-template">
+	<div class="site-wrapper">
+		
+
+
+
+
+<header class="site-header post-site-header outer">
+    <div class="inner">
+        
+<nav class="site-nav"> 
+    <div class="site-nav-left">
+        <ul class="nav">
+            <li>
+                
+                <a href="/" title="Home">HOME</a>
+                
+            </li>
+            
+            
+            <li>
+                <a href="/about" title="ABOUT">ABOUT</a>
+            </li>
+            
+            <li>
+                <a href="/archives" title="ARCHIVES">ARCHIVES</a>
+            </li>
+            
+            
+        </ul> 
+    </div>
+    
+    <div class="search-button-area">
+        <a href="#search" class="search-button">Search ...</a>
+    </div>
+     
+    <div class="site-nav-right">
+        
+        <a href="#search" class="search-button">Search ...</a>
+         
+        
+<div class="social-links">
+    
+    
+    
+    
+    
+    
+    
+</div>
+    </div>
+</nav>
+    </div>
+</header>
+
+
+<div id="site-main" class="site-main outer" role="main">
+    <div class="inner">
+        <header class="post-full-header">
+            <div class="post-full-meta">
+                <time class="post-full-meta-date" datetime="2021-05-27T09:08:05.620Z">
+                    2021-05-27
+                </time>
+                
+                <span class="date-divider">/</span>
+                
+                
+            </div>
+            <h1 class="post-full-title">【论文翻译】GPEN:基于先验GAN嵌入网络的盲人脸重建问题解决方案</h1>
+        </header>
+        <div class="post-full no-image">
+            
+            <div class="post-full-content">
+                <article id="photoswipe" class="markdown-body">
+                    <p><img alt="1" class="post-img b-lazy" data-img="https://linimages.oss-cn-beijing.aliyuncs.com/typora/header_image2.png" data-index="0" data-src="https://linimages.oss-cn-beijing.aliyuncs.com/typora/header_image2.png"></p>
+<h2 id="略过简介和之前的工作"><a href="#略过简介和之前的工作" class="headerlink" title="略过简介和之前的工作"></a>略过简介和之前的工作</h2><p>​    在这个工作中，我们重新探索了盲人脸超分辨问题。我们的目标是复原那些在自然界观察得到的退化人脸，我们的idea是去无缝融合GAN和DNN的优点。我们首先预训练了一个GAN，这个GAN是为了高清人脸照片生成的，以及把它嵌入到一个DNN中作为一个人脸修复的前置解码器。</p>
+<p>​    然后，这个以GAN为前置解码器的DNN被一系列的综合的一对对低情-高清人脸微调。在此期间DNN学习将退化的图像输入映射到一个所需的潜在空间，以至于这个GAN前置网络可以重建所需的高清人脸照片。</p>
+<p>​    我们仔细地设计了GAN模块，让它能更好与符合一个U形设计的DNN。在这里这些深层特征是针对全部人脸重建提取的，被用于生成浅编码，同时浅层特征被用于作为噪声去生成局部人脸细节和保持图像背景。</p>
+<p>​    在这个方法下，我们训练好的模型可以重建高清人脸的真实照片细节从自然界的退化人脸，避免了过度平滑的结果（由盲人脸问题的high illness造成的）。</p>
+<p>做个总结：</p>
+<ul>
+<li>我们学习和嵌入了一个GAN前置网络到一个DNN中，并且为了在自然盲人脸重建中有效，我们微调了这个被嵌入到的DNN中的GAN（？）。这是有价值的记录了之前仅将预训练的GAN转化为一个网络而没有微调。</li>
+<li>这个GAN模块被设计过，所以他们可以被轻松地嵌入到一个U形的DNN中通过微调。GAN的浅编码和噪声输入是分别被生成从DNN的深层和浅层特征来重建全局结构，局部人脸细节和图像背景。</li>
+<li>我们的模型设置了新的SOTA在盲人脸复原，这非常好的解决了真实世界退化照片复原问题。</li>
+</ul>
+<h2 id="3-1动机与框架"><a href="#3-1动机与框架" class="headerlink" title="3.1动机与框架"></a>3.1动机与框架</h2><p>​    BFR是一个经典的ill-posed inverse问题。X空间里是退化低清人脸，Y空间是原始高清人脸，给一个低清人脸输入x<em>∈</em> X，BFR目标是找到它合适的清晰人脸图像y<em>∈</em> Y。</p>
+<p>​    大多数基于DNN的办法学习一个匹配功能Φ 去达到目的。Φ (x)—&gt;y。但是，这是一个一对多的逆问题，在Y中有很多可能的人脸图能匹配到输入x。通常存在办法训练DNN模型是建立x与y之间的映射，使用一些逐像素的loss函数。结果，正如我们在下面看到的那样，最后的结果Φ(x)倾向于成为那些HQ人脸的平均，它是过度平滑且失去了细节。</p>
+<p><img alt="image-20210527214539138" class="post-img b-lazy" data-img="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527214539138.png" data-index="1" data-src="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527214539138.png"></p>
+<p>​    这符合视觉感知全局优先理论。</p>
+<p>​    cGAN方法可以部分的解决这个问题通过对抗训练去减少在匹配中的不确定性。但是，当退化是严重时，这个问题仍然存在，并且cGANs几乎不能生成清晰的带有真实纹理和细节的人脸图像。</p>
+<p>​    与这之前的办法不同的是，我们首先训练一个GAN先验网络，然后把它嵌入到一个DNN中作为一个针对高清人脸复原的解码器。我们叫他们的算法先验GAN嵌入网络（GPEN）。我们的GPEN的第一部分是一个CNN编码器，它学习到将输入的退化图像x映射到一个需要的隐编码z在GAN的隐空间Z中。</p>
+<p>​    然后GAN先验网络能够重产出需要的高清人脸图像通过G(z)—&gt;y，在这里G指的是GAN的预训练生成器。生成过程基本是一个点到点的映射，能极大地减轻在过去办法中的一到多映射的不确定性。GAN拟方向办法分享了一个相似的idea给我们的GPEN。但是，他们保持了与训练GANs不改变为了人脸操作的一致和方便。</p>
+<p>​    而在GPEN中，我们仔细地设计和预训练了GAN模块和微调了先验GANs为了有效的BFR。GPEN的结构和GAN模块如下，它们将在下面的sections详细解释。</p>
+<h2 id="3-2网络结构"><a href="#3-2网络结构" class="headerlink" title="3.2网络结构"></a>3.2网络结构</h2><h2 id="4-1数据集和评估方案"><a href="#4-1数据集和评估方案" class="headerlink" title="4.1数据集和评估方案"></a>4.1数据集和评估方案</h2><p>​    FFHQ数据机包含了7w张高清人脸图像，分辨率均为1024*1024，被用于训练我们的模型。我们首先使用它去训练GAN先验网络，然后采用基于FFHQ数据集制备的退化数据来微调整个GPEN。</p>
+<p>​    为了评估我们的模型，我们使用CelebA-HQ数据机去评估低清人脸图像来量化比较GPEN与其他的SOTA方案。我们也收集了1000张来自网络的真实世界的低清人脸来评估我们的模型在wild的表现。</p>
+<p>​    在量化评估里，PSNR，FID和LPIPS是被使用的。值得一提的是，所有这些方法只能被作为参考，因为他们不能真正的反应一个盲人脸修复算法的表现，特别是对于wild盲人脸复原问题。</p>
+<p><img alt="image-20210527215957469" class="post-img b-lazy" data-img="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527215957469.png" data-index="2" data-src="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527215957469.png"></p>
+<h2 id="4-2低清与高清图像对的制备"><a href="#4-2低清与高清图像对的制备" class="headerlink" title="4.2低清与高清图像对的制备"></a>4.2低清与高清图像对的制备</h2><p>​    我们人工合成（synthesize）退化人脸，这些人脸源于FFHQ中的高清图像，它们使用了下面的退化模型：</p>
+<p><img alt="image-20210527180451448" class="post-img b-lazy" data-img="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527180451448.png" data-index="3" data-src="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527180451448.png"></p>
+<ul>
+<li>I：输入人脸图</li>
+<li>k：模糊核</li>
+<li>n<em>σ</em>：高斯噪声</li>
+<li>Id：退化图像</li>
+<li>圆圈+叉：二维卷积</li>
+<li>下箭头+s：标准s折下采样</li>
+<li>JPEG带有q质量因子的压缩操作</li>
+</ul>
+<p>​    以上的退化模型以及被使用在了过去的办法中。</p>
+<p>​    在我们的方案，对于每张图片：</p>
+<ul>
+<li>模糊核k是从一系列的模糊模型中随机选择的，包括高斯模糊和运动模糊用了变化的核尺寸。</li>
+<li>额外的高斯噪声n是从正态分布沿通过取平均值，<em>σ</em>是从[0,25]取的。</li>
+<li>s的值是随机和一律从[10,200]采样（直到200次下采样）。</li>
+<li>q是对每张图片随机和一律从[5,50]（直到95%JPEG压缩率）</li>
+</ul>
+<p>​    通过使用这些退化图像来微调模型，GPEN的编码部分可以学习去生成合适的浅编码和噪声输入，浅编码和噪声输入到GAN解码网络里，这同时被更新去处理现实脚本中的退化人脸。</p>
+<p>​    在模型更新期间，我们采用了Adam优化器带着batchsize=1。学习率是变化的对于GPEN的不同部分，包括编码器，解码器和分类器。在我们的方案中，我们让编码器的学习率=0.002，设置编码器：解码器：分类器=100:10:1。它应该被记录的是，分类器部分在测试环节中将被移除。</p>
+<h2 id="4-3-消融实验"><a href="#4-3-消融实验" class="headerlink" title="4.3 消融实验"></a>4.3 消融实验</h2><p>​    为了更好的理解GPEN中不同组件的角色以及训练策略，在这个部分我们做了一个消融实验通过指导GPEN中的一些变体和比较他们的盲人脸复原表现。</p>
+<p>​    第一个变体是GPEN-w/o-ft，它的GAN先验网络在整个微调流程中保持不变。</p>
+<p>​    第二个变体是GPEN-w/o-noise，这指的是这个GPEN模型没有噪声输入。</p>
+<p>​    第三个变体是GPEN-noise-add，这是指噪声输入是add的而不是连接到卷积中的。</p>
+<p>​    我们基于CelebA-HQ数据集来评估GPEN和它的三个变体。LQ图像是使用退化模型制备的（4.2）。</p>
+<p><img alt="image-20210527204206871" class="post-img b-lazy" data-img="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527204206871.png" data-index="4" data-src="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527204206871.png"></p>
+<p>​    我们可以看到GPE有更好的数值表现比起它的变体。</p>
+<p><img alt="image-20210527204311354" class="post-img b-lazy" data-img="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527204311354.png" data-index="5" data-src="https://linimages.oss-cn-beijing.aliyuncs.com/typora/image-20210527204311354.png"></p>
+<p>​    上图展示了变体与本体在一张图上的不同结果。我们可以看到GPEN-w/o-ft可以生成干净的高清人脸图像，但是，这张人脸和ground-truth完全不同，以及这张图片的背景也完全不同。这是因为没有微调先验GAN，它是非常困难的生成需要的浅编码到隐空间Z，这符合在很多GAN倒置工作中的发现。</p>
+<p>​    通过消除噪声输出，GPEN-w/o-noise的结果是比起GPEN-w/o-ft更模糊的，以及有一些压缩伪影生成在图像的边缘。这表明噪声输入在合成局部细节上起到了重要作用。</p>
+<p>​    GPEN-noise-add达到了和GPEN相近的效果不是轻微的少了一些面部细节，而它生成了一些错误的细节在图像的背景上。</p>
+<p>​    总的来说，GPEN比起它的变体要有更好的表现，表明了拼接的U形结构和我们的训练方案对于盲人脸复原任务的有效性。</p>
+<h2 id="4-4-在人工合成图像上的实验"><a href="#4-4-在人工合成图像上的实验" class="headerlink" title="4.4 在人工合成图像上的实验"></a>4.4 在人工合成图像上的实验</h2><p>​    为了量化的比较GPEN与其他SOTA，我们首先在人工合成图像上进行实验。比起很多人脸复原方法通常是被设计于人脸超分（FSR）而不是盲人脸复原（BFR），我们分别进行了在FSR和BFR上的实验，在其中不同的比较方案是被用于一对对照中。</p>
+<h3 id="盲人脸复原"><a href="#盲人脸复原" class="headerlink" title="盲人脸复原"></a>盲人脸复原</h3><p>​    通过使用退化模型和与4.2相同的参数设置，我们人工合成了一系列的LQ人脸图像在CelebA-HQ数据集上，用于评估。我们比较了GPEN与最新的BFR办法，包括Pix2PixHD ,</p>
+<p>Super-FAN, GFRNet, GWAInet, DFDNet ,HiFaceGAN。这些模型是原作者训练版本。</p>
+<p>​    我们在这个实验中与那些人脸超分方法比较在这个实验中，因为他们假设了一种非常简单的退化的模型。（例如：bicubic下采样）和不能解决这个有挑战性的盲人脸复原任务。</p>
+<h2 id="要补习的知识点"><a href="#要补习的知识点" class="headerlink" title="要补习的知识点"></a>要补习的知识点</h2><ul>
+<li>U-net</li>
+<li>StyleGAN</li>
+</ul>
+
+                </article>
+                <ul class="tags-postTags">
+                    
+                    <li>
+                        <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"># 机器学习</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    
+    <nav id="gobottom" class="pagination">
+        
+        <span class="prev-next-post">·</span>
+        
+        <a class="next-post" title="MIT AI大佬的一天是怎样度过的" href="/2021/05/25/MIT%20AI%20Research%E7%9A%84%E4%B8%80%E5%A4%A9/">
+            MIT AI大佬的一天是怎样度过的 →
+        </a>
+        
+    </nav>
+
+    
+    <div class="inner">
+        <div id="comment"></div>
+    </div>
+    
+</div>
+
+<div class="toc-bar">
+    <div class="toc-btn-bar">
+        <a href="#site-main" class="toc-btn">
+            <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M793.024 710.272a32 32 0 1 0 45.952-44.544l-310.304-320a32 32 0 0 0-46.4 0.48l-297.696 320a32 32 0 0 0 46.848 43.584l274.752-295.328 286.848 295.808z"></path></svg>
+        </a>
+        <div class="toc-btn toc-switch">
+            <svg class="toc-open" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M779.776 480h-387.2a32 32 0 0 0 0 64h387.2a32 32 0 0 0 0-64M779.776 672h-387.2a32 32 0 0 0 0 64h387.2a32 32 0 0 0 0-64M256 288a32 32 0 1 0 0 64 32 32 0 0 0 0-64M392.576 352h387.2a32 32 0 0 0 0-64h-387.2a32 32 0 0 0 0 64M256 480a32 32 0 1 0 0 64 32 32 0 0 0 0-64M256 672a32 32 0 1 0 0 64 32 32 0 0 0 0-64"></path></svg>
+            <svg class="toc-close hide" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M512 960c-247.039484 0-448-200.960516-448-448S264.960516 64 512 64 960 264.960516 960 512 759.039484 960 512 960zM512 128.287273c-211.584464 0-383.712727 172.128262-383.712727 383.712727 0 211.551781 172.128262 383.712727 383.712727 383.712727 211.551781 0 383.712727-172.159226 383.712727-383.712727C895.712727 300.415536 723.551781 128.287273 512 128.287273z"></path><path d="M557.05545 513.376159l138.367639-136.864185c12.576374-12.416396 12.672705-32.671738 0.25631-45.248112s-32.704421-12.672705-45.248112-0.25631l-138.560301 137.024163-136.447897-136.864185c-12.512727-12.512727-32.735385-12.576374-45.248112-0.063647-12.512727 12.480043-12.54369 32.735385-0.063647 45.248112l136.255235 136.671523-137.376804 135.904314c-12.576374 12.447359-12.672705 32.671738-0.25631 45.248112 6.271845 6.335493 14.496116 9.504099 22.751351 9.504099 8.12794 0 16.25588-3.103239 22.496761-9.247789l137.567746-136.064292 138.687596 139.136568c6.240882 6.271845 14.432469 9.407768 22.65674 9.407768 8.191587 0 16.352211-3.135923 22.591372-9.34412 12.512727-12.480043 12.54369-32.704421 0.063647-45.248112L557.05545 513.376159z"></path></svg>
+        </div>
+        <a href="#gobottom" class="toc-btn">
+            <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M231.424 346.208a32 32 0 0 0-46.848 43.584l297.696 320a32 32 0 0 0 46.4 0.48l310.304-320a32 32 0 1 0-45.952-44.544l-286.848 295.808-274.752-295.36z"></path></svg>
+        </a>
+    </div>
+    <div class="toc-main">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%95%A5%E8%BF%87%E7%AE%80%E4%BB%8B%E5%92%8C%E4%B9%8B%E5%89%8D%E7%9A%84%E5%B7%A5%E4%BD%9C"><span class="toc-text">略过简介和之前的工作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1%E5%8A%A8%E6%9C%BA%E4%B8%8E%E6%A1%86%E6%9E%B6"><span class="toc-text">3.1动机与框架</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84"><span class="toc-text">3.2网络结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1%E6%95%B0%E6%8D%AE%E9%9B%86%E5%92%8C%E8%AF%84%E4%BC%B0%E6%96%B9%E6%A1%88"><span class="toc-text">4.1数据集和评估方案</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2%E4%BD%8E%E6%B8%85%E4%B8%8E%E9%AB%98%E6%B8%85%E5%9B%BE%E5%83%8F%E5%AF%B9%E7%9A%84%E5%88%B6%E5%A4%87"><span class="toc-text">4.2低清与高清图像对的制备</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-%E6%B6%88%E8%9E%8D%E5%AE%9E%E9%AA%8C"><span class="toc-text">4.3 消融实验</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-4-%E5%9C%A8%E4%BA%BA%E5%B7%A5%E5%90%88%E6%88%90%E5%9B%BE%E5%83%8F%E4%B8%8A%E7%9A%84%E5%AE%9E%E9%AA%8C"><span class="toc-text">4.4 在人工合成图像上的实验</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%B2%E4%BA%BA%E8%84%B8%E5%A4%8D%E5%8E%9F"><span class="toc-text">盲人脸复原</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A6%81%E8%A1%A5%E4%B9%A0%E7%9A%84%E7%9F%A5%E8%AF%86%E7%82%B9"><span class="toc-text">要补习的知识点</span></a></li></ol>
+    </div>
+</div>
+
+
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+	</div>
+	
+
+
+<aside class="read-next outer">
+    <div class="inner">
+        <div class="read-next-feed">
+            
+            
+
+<article class="read-next-card" style="background-image: url(https://inkfishing.oss-cn-hangzhou.aliyuncs.com/%E7%84%95%E5%BD%B1-%E9%80%9A%E7%94%A8%E6%96%87%E4%BB%B6/background_v2.png)">
+  <header class="read-next-card-header">
+    <small class="read-next-card-header-sitetitle">— 小林的思考簿 —</small>
+    <h3 class="read-next-card-header-title">最新文章</h3>
+  </header>
+  <div class="read-next-divider">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path d="M13 14.5s2 3 5 3 5.5-2.463 5.5-5.5S21 6.5 18 6.5c-5 0-7 11-12 11C2.962 17.5.5 15.037.5 12S3 6.5 6 6.5s4.5 3.5 4.5 3.5"></path>
+    </svg>
+  </div>
+  <div class="read-next-card-content">
+    <ul>
+      
+      
+      
+      <li>
+        <a href="/2021/05/27/%E3%80%90%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E3%80%91GPEN/">【论文翻译】GPEN:基于先验GAN嵌入网络的盲人脸重建问题解决方案</a>
+      </li>
+      
+      
+      
+      <li>
+        <a href="/2021/05/25/MIT%20AI%20Research%E7%9A%84%E4%B8%80%E5%A4%A9/">MIT AI大佬的一天是怎样度过的</a>
+      </li>
+      
+      
+      
+      <li>
+        <a href="/2021/05/23/%E7%84%95%E5%BD%B1%E4%B8%80%E6%96%B0v1.1.0/">脱胎换骨！焕影一新v1.1.0【更新日志】</a>
+      </li>
+      
+      
+      
+      
+    </ul>
+  </div>
+  <footer class="read-next-card-footer">
+    <a href="/archives">  MORE  → </a>
+  </footer>
+</article>
+
+            
+            
+            
+
+
+            
+            
+            
+
+<article class="read-next-card" style="background-image: url(https://inkfishing.oss-cn-hangzhou.aliyuncs.com/%E7%84%95%E5%BD%B1-%E9%80%9A%E7%94%A8%E6%96%87%E4%BB%B6/background_v2.png)">
+	<header class="read-next-card-header tagcloud-card">
+		<h3 class="read-next-card-header-title">标签云</h3>
+	</header>
+	<div class="read-next-card-content-ext">
+		<a href="/tags/%E4%BA%A7%E5%93%81/" style="font-size: 14px;">产品</a> <a href="/tags/%E6%88%90%E9%95%BF/" style="font-size: 14px;">成长</a> <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" style="font-size: 24px;">机器学习</a>
+	</div>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+	
+
+
+
+
+<div id="search" class="search-overlay">
+    <div class="search-form">
+        
+        <div class="search-overlay-logo">
+        	<img src="https://inkfishing.oss-cn-hangzhou.aliyuncs.com/%E7%84%95%E5%BD%B1-%E9%80%9A%E7%94%A8%E6%96%87%E4%BB%B6/%E5%90%84%E7%A7%8Dlogo/%E5%B0%8F%E7%84%95%E5%A4%B4%E5%83%8F_%E8%93%9D.PNG" alt="小林的思考簿">
+        </div>
+        
+        <input id="local-search-input" class="search-input" type="text" name="search" placeholder="搜索 ...">
+        <a class="search-overlay-close" href="#"></a>
+    </div>
+    <div id="local-search-result"></div>
+</div>
+
+<footer class="site-footer outer">
+	<div class="site-footer-content inner">
+		<div class="copyright">
+			<a href="/" title="小林的思考簿">小林的思考簿 © 2021</a>
+			
+				
+			        <span hidden="true" id="/2021/05/27/%E3%80%90%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E3%80%91GPEN/" class="leancloud-visitors" data-flag-title="【论文翻译】GPEN:基于先验GAN嵌入网络的盲人脸重建问题解决方案">
+			            <span>阅读量 </span>
+			            <span class="leancloud-visitors-count">0</span>
+			        </span>
+	    		
+    		
+		</div>
+		<nav class="site-footer-nav">
+			
+			<a href="https://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a>
+			<a href="https://github.com/xzhih/hexo-theme-casper" title="Casper" target="_blank" rel="noopener">Casper</a>
+		</nav>
+	</div>
+</footer>
+	
+
+
+<script>
+    if(window.navigator && navigator.serviceWorker) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for(let registration of registrations) {
+                registration.unregister()
+            }
+        })
+    }
+</script>
+
+
+<script id="scriptLoad" src="/js/allinone.min.js" async=""></script>
+
+
+<script>
+    document.getElementById('scriptLoad').addEventListener('load', function () {
+        
+        
+            var bLazy = new Blazy();
+        
+
+        
+        
+
+        
+        
+        
+            searchFunc("/");
+        
+        
+    })
+</script>
+
+
+
+
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+
+
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+
+
+<script src="/photoswipe/photoswipe.min.js"></script>
+
+
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+
+
+
+
+<script id="valineScript" src="//unpkg.com/valine/dist/Valine.min.js" async=""></script>
+<script>
+    document.getElementById('valineScript').addEventListener("load", function() {
+        new Valine({
+            el: '#comment' ,
+            verify: false,
+            notify: false,
+            appId: '',
+            appKey: '',
+            placeholder: 'Just go go',
+            pageSize: 10,
+            avatar: 'mm',
+            visitor: true
+        })
+    });
+</script>
+
+
+
+
+
+
+
+</body></html>
