@@ -17,10 +17,10 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 	<meta name="generator" content="hexo">
 	<meta name="author" content="林泽毅kavin">
-	<meta name="description" content="如何快速分享你的算法让人体验？试试Gradio。">
+	<meta name="description" content="123">
 
 	
-	<meta name="keywords" content="如何快速分享你的算法让人体验？试试Gradio。">
+	<meta name="keywords" content="123">
 	
 
 	
@@ -40,7 +40,7 @@
 	<meta property="og:site_name" content="小林的思考簿">
 	<meta property="og:type" content="article">
 	<meta property="og:title" content="【论文翻译】GPEN:基于先验GAN嵌入网络的盲人脸重建问题解决方案 | 小林的思考簿">
-	<meta property="og:description" content="如何快速分享你的算法让人体验？试试Gradio。">
+	<meta property="og:description" content="123">
 	<meta property="og:url" content="http://example.com/2021/05/27/%E3%80%90%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E3%80%91GPEN/">
 
 	
@@ -217,10 +217,18 @@
 <p>​    通过消除噪声输出，GPEN-w/o-noise的结果是比起GPEN-w/o-ft更模糊的，以及有一些压缩伪影生成在图像的边缘。这表明噪声输入在合成局部细节上起到了重要作用。</p>
 <p>​    GPEN-noise-add达到了和GPEN相近的效果不是轻微的少了一些面部细节，而它生成了一些错误的细节在图像的背景上。</p>
 <p>​    总的来说，GPEN比起它的变体要有更好的表现，表明了拼接的U形结构和我们的训练方案对于盲人脸复原任务的有效性。</p>
-<h2 id="要补习的知识点"><a href="#要补习的知识点" class="headerlink" title="要补习的知识点"></a>要补习的知识点</h2><ul>
+<h2 id="To-do"><a href="#To-do" class="headerlink" title="To do"></a>To do</h2><h3 id="要补习的知识点"><a href="#要补习的知识点" class="headerlink" title="要补习的知识点"></a>要补习的知识点</h3><ul>
 <li>GAN基础知识与训练知识</li>
 <li>U-net</li>
 <li>StyleGAN</li>
+</ul>
+<h3 id="要去做的工作"><a href="#要去做的工作" class="headerlink" title="要去做的工作"></a>要去做的工作</h3><ul>
+<li>BasicSR源码解读学习</li>
+<li>准备数据集FFHQ</li>
+<li>写好下采样算法</li>
+<li>写好网络结构（难）</li>
+<li>写好训练过程</li>
+<li>在服务器上进行训练</li>
 </ul>
 
                 </article>
@@ -267,7 +275,7 @@
         </a>
     </div>
     <div class="toc-main">
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1%EF%BD%9E2-%E5%BC%80%E9%97%A8%E8%A7%81%E5%B1%B1"><span class="toc-text">1～2.开门见山</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1%E5%8A%A8%E6%9C%BA%E4%B8%8E%E6%A1%86%E6%9E%B6"><span class="toc-text">3.1动机与框架</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84"><span class="toc-text">3.2网络结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#GAN%E5%85%88%E9%AA%8C%E7%BD%91%E7%BB%9C"><span class="toc-text">GAN先验网络</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%8C%E6%95%B4%E7%9A%84%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84"><span class="toc-text">完整的网络结构</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3-%E8%AE%AD%E7%BB%83%E7%AD%96%E7%95%A5"><span class="toc-text">3.3 训练策略</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1%E6%95%B0%E6%8D%AE%E9%9B%86%E5%92%8C%E8%AF%84%E4%BC%B0%E6%96%B9%E6%A1%88"><span class="toc-text">4.1数据集和评估方案</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2%E4%BD%8E%E6%B8%85%E4%B8%8E%E9%AB%98%E6%B8%85%E5%9B%BE%E5%83%8F%E5%AF%B9%E7%9A%84%E5%88%B6%E5%A4%87"><span class="toc-text">4.2低清与高清图像对的制备</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-%E6%B6%88%E8%9E%8D%E5%AE%9E%E9%AA%8C"><span class="toc-text">4.3 消融实验</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A6%81%E8%A1%A5%E4%B9%A0%E7%9A%84%E7%9F%A5%E8%AF%86%E7%82%B9"><span class="toc-text">要补习的知识点</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1%EF%BD%9E2-%E5%BC%80%E9%97%A8%E8%A7%81%E5%B1%B1"><span class="toc-text">1～2.开门见山</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1%E5%8A%A8%E6%9C%BA%E4%B8%8E%E6%A1%86%E6%9E%B6"><span class="toc-text">3.1动机与框架</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84"><span class="toc-text">3.2网络结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#GAN%E5%85%88%E9%AA%8C%E7%BD%91%E7%BB%9C"><span class="toc-text">GAN先验网络</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%8C%E6%95%B4%E7%9A%84%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84"><span class="toc-text">完整的网络结构</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3-%E8%AE%AD%E7%BB%83%E7%AD%96%E7%95%A5"><span class="toc-text">3.3 训练策略</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1%E6%95%B0%E6%8D%AE%E9%9B%86%E5%92%8C%E8%AF%84%E4%BC%B0%E6%96%B9%E6%A1%88"><span class="toc-text">4.1数据集和评估方案</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2%E4%BD%8E%E6%B8%85%E4%B8%8E%E9%AB%98%E6%B8%85%E5%9B%BE%E5%83%8F%E5%AF%B9%E7%9A%84%E5%88%B6%E5%A4%87"><span class="toc-text">4.2低清与高清图像对的制备</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-%E6%B6%88%E8%9E%8D%E5%AE%9E%E9%AA%8C"><span class="toc-text">4.3 消融实验</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#To-do"><span class="toc-text">To do</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A6%81%E8%A1%A5%E4%B9%A0%E7%9A%84%E7%9F%A5%E8%AF%86%E7%82%B9"><span class="toc-text">要补习的知识点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A6%81%E5%8E%BB%E5%81%9A%E7%9A%84%E5%B7%A5%E4%BD%9C"><span class="toc-text">要去做的工作</span></a></li></ol></li></ol>
     </div>
 </div>
 
